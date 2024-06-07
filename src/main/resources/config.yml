@@ -1,0 +1,20 @@
+# Developer https://t.me/IBoTuS
+
+sound-pickup: #Звук при подборе предметов в шалкер
+  sound: ENTITY_ITEM_PICKUP #Название звука
+  volume: 0.3 #Громкость
+  pitch: 1.0 #Темп
+
+shulker-inventory:
+  #Включить/Выключить всасывания ресурсов в пустой шалкер игрока
+  enabled: true
+  #Какие шалкера будут всасывать ресурсы
+  whitelist-shulker: [SHULKER_BOX, WHITE_SHULKER_BOX, LIGHT_GRAY_SHULKER_BOX, GRAY_SHULKER_BOX, BLACK_SHULKER_BOX, BROWN_SHULKER_BOX, RED_SHULKER_BOX, ORANGE_SHULKER_BOX, YELLOW_SHULKER_BOX, LIME_SHULKER_BOX, GREEN_SHULKER_BOX, CYAN_SHULKER_BOX, LIGHT_BLUE_SHULKER_BOX, BLUE_SHULKER_BOX, PURPLE_SHULKER_BOX, MAGENTA_SHULKER_BOX, PINK_SHULKER_BOX]
+  #Какие предметы не будет всасывать шалкер
+  blacklist-items: [SHULKER_BOX, WHITE_SHULKER_BOX, LIGHT_GRAY_SHULKER_BOX, GRAY_SHULKER_BOX, BLACK_SHULKER_BOX, BROWN_SHULKER_BOX, RED_SHULKER_BOX, ORANGE_SHULKER_BOX, YELLOW_SHULKER_BOX, LIME_SHULKER_BOX, GREEN_SHULKER_BOX, CYAN_SHULKER_BOX, LIGHT_BLUE_SHULKER_BOX, BLUE_SHULKER_BOX, PURPLE_SHULKER_BOX, MAGENTA_SHULKER_BOX, PINK_SHULKER_BOX]
+
+shulker-open:
+  #Включить/Выключить открытия шалкеров при клике правой кнопки мыши шалкером по воздуху
+  enabled: true
+  #Какие шалкера будут открываться при клике правой кнопки мыши шалкером по воздуху
+  shulker-list: [SHULKER_BOX, WHITE_SHULKER_BOX, LIGHT_GRAY_SHULKER_BOX, GRAY_SHULKER_BOX, BLACK_SHULKER_BOX, BROWN_SHULKER_BOX, RED_SHULKER_BOX, ORANGE_SHULKER_BOX, YELLOW_SHULKER_BOX, LIME_SHULKER_BOX, GREEN_SHULKER_BOX, CYAN_SHULKER_BOX, LIGHT_BLUE_SHULKER_BOX, BLUE_SHULKER_BOX, PURPLE_SHULKER_BOX, MAGENTA_SHULKER_BOX, PINK_SHULKER_BOX]

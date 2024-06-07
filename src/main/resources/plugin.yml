@@ -1,0 +1,5 @@
+name: IBInvShulker
+version: '${project.version}'
+main: ibotus.ibinvshulker.IBInvShulker
+api-version: '1.16'
+authors: [IBoTuS]
