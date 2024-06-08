@@ -3,6 +3,7 @@ package ibotus.ibinvshulker.events;
 
 import ibotus.ibinvshulker.configurations.Config;
 
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -12,6 +13,8 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+
+import java.util.List;
 
 public class ShulkerInventoryEvent implements Listener {
 
@@ -24,6 +27,11 @@ public class ShulkerInventoryEvent implements Listener {
         Player player = event.getPlayer();
         ItemStack pickupItem = event.getItem().getItemStack();
         Inventory playerInventory = player.getInventory();
+
+        List<Material> blockedItems = Config.getBlockedItems();
+        if (blockedItems.contains(pickupItem.getType())) {
+            return;
+        }
         
         for (ItemStack item : playerInventory.getContents()) {
             if (item != null && Config.getWhitelistedShulkers().contains(item.getType())) {
