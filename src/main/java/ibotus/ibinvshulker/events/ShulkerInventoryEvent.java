@@ -22,39 +22,55 @@ public class ShulkerInventoryEvent implements Listener {
         }
 
         Player player = event.getPlayer();
-        Inventory inventory = player.getInventory();
+        ItemStack pickupItem = event.getItem().getItemStack();
+        Inventory playerInventory = player.getInventory();
+        
+        for (ItemStack item : playerInventory.getContents()) {
+            if (item != null && Config.getWhitelistedShulkers().contains(item.getType())) {
+                BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
+                if (meta != null && meta.getBlockState() instanceof ShulkerBox) {
+                    ShulkerBox shulkerBox = (ShulkerBox) meta.getBlockState();
+                    Inventory shulkerInventory = shulkerBox.getInventory();
 
-        if (inventory.firstEmpty() == -1) {
+                    int spaceLeftInShulker = calculateSpaceLeftInShulker(shulkerInventory, pickupItem);
+                    if (spaceLeftInShulker > 0) {
+                        int amountToAdd = Math.min(spaceLeftInShulker, pickupItem.getAmount());
 
-            ItemStack pickupItem = event.getItem().getItemStack();
-            for (ItemStack item : inventory.getContents()) {
-                if (item != null && Config.getWhitelistedShulkers().contains(item.getType())) {
+                        ItemStack toAdd = pickupItem.clone();
+                        toAdd.setAmount(amountToAdd);
 
-                    BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
-                    if (meta != null && meta.getBlockState() instanceof ShulkerBox) {
-                        ShulkerBox shulkerBox = (ShulkerBox) meta.getBlockState();
-                        Inventory shulkerInventory = shulkerBox.getInventory();
+                        shulkerInventory.addItem(toAdd);
 
-                        if (shulkerInventory.firstEmpty() != -1) {
-                            if (Config.getBlockedItems().contains(pickupItem.getType())) {
-                                event.setCancelled(true);
-                                return;
-                            }
-                            shulkerInventory.addItem(pickupItem);
-                            meta.setBlockState(shulkerBox);
-                            item.setItemMeta(meta);
-                            event.getItem().remove();
+                        pickupItem.setAmount(pickupItem.getAmount() - amountToAdd);
 
-                            String soundKey = "sound-pickup";
-                            Sound sound = Sound.valueOf(Config.getConfig().getString(soundKey + ".sound"));
-                            float volume = (float) Config.getConfig().getDouble(soundKey + ".volume");
-                            float pitch = (float) Config.getConfig().getDouble(soundKey + ".pitch");
-                            player.playSound(player.getLocation(), sound, volume, pitch);
-                            return;
+                        meta.setBlockState(shulkerBox);
+                        item.setItemMeta(meta);
+
+                        if (pickupItem.getAmount() <= 0) {
+                            event.setCancelled(true);
                         }
+
+                        String soundKey = "sound-pickup";
+                        Sound sound = Sound.valueOf(Config.getConfig().getString(soundKey + ".sound"));
+                        float volume = (float) Config.getConfig().getDouble(soundKey + ".volume");
+                        float pitch = (float) Config.getConfig().getDouble(soundKey + ".pitch");
+                        player.playSound(player.getLocation(), sound, volume, pitch);
+                        return;
                     }
                 }
             }
         }
+    }
+
+    private int calculateSpaceLeftInShulker(Inventory shulkerInventory, ItemStack item) {
+        int spaceLeft = 0;
+        for (ItemStack content : shulkerInventory.getContents()) {
+            if (content == null) {
+                spaceLeft += item.getMaxStackSize();
+            } else if (content.isSimilar(item)) {
+                spaceLeft += (item.getMaxStackSize() - content.getAmount());
+            }
+        }
+        return spaceLeft;
     }
 }
