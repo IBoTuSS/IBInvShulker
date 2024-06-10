@@ -1,4 +1,4 @@
-package ibotus.ibinvshulker.events;
+package ibotus.ibinvshulker.event;
 
 
 import ibotus.ibinvshulker.configurations.Config;

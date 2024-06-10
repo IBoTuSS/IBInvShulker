@@ -1,8 +1,8 @@
 package ibotus.ibinvshulker;
 
 import ibotus.ibinvshulker.configurations.Config;
-import ibotus.ibinvshulker.events.ShulkerInventoryEvent;
-import ibotus.ibinvshulker.events.ShulkerOpenEvent;
+import ibotus.ibinvshulker.event.ShulkerInventoryEvent;
+import ibotus.ibinvshulker.event.ShulkerOpenEvent;
 import ibotus.ibinvshulker.utils.HexColor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -19,17 +19,17 @@ public class IBInvShulker extends JavaPlugin implements Listener {
     public void onEnable() {
         Config.loadYaml(this);
         Bukkit.getConsoleSender().sendMessage("");
-        this.msg("&fDeveloper: &aIBoTuS");
-        this.msg("&fVersion: &dv" + this.getDescription().getVersion());
+        msg("&fDeveloper: &aIBoTuS");
+        msg("&fVersion: &dv" + this.getDescription().getVersion());
         Bukkit.getConsoleSender().sendMessage("");
-        this.getServer().getPluginManager().registerEvents(new ShulkerInventoryEvent(), this);
-        this.getServer().getPluginManager().registerEvents(new ShulkerOpenEvent(this), this);
+        getServer().getPluginManager().registerEvents(new ShulkerInventoryEvent(), this);
+        getServer().getPluginManager().registerEvents(new ShulkerOpenEvent(this), this);
     }
 
     @Override
     public void onDisable() {
         Bukkit.getConsoleSender().sendMessage("");
-        this.msg("&fDisable plugin.");
+        msg("&fDisable plugin.");
         Bukkit.getConsoleSender().sendMessage("");
     }
 

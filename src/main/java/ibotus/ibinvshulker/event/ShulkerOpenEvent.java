@@ -1,4 +1,4 @@
-package ibotus.ibinvshulker.events;
+package ibotus.ibinvshulker.event;
 
 import ibotus.ibinvshulker.IBInvShulker;
 import ibotus.ibinvshulker.configurations.Config;
@@ -44,7 +44,7 @@ public class ShulkerOpenEvent implements Listener {
                 float volume = (float) Config.getConfig().getDouble(soundKey + ".volume");
                 float pitch = (float) Config.getConfig().getDouble(soundKey + ".pitch");
                 player.playSound(player.getLocation(), sound, volume, pitch);
-                player.sendMessage(Objects.requireNonNull(HexColor.color(Config.getConfig().getString("shulker-open.shulker-combat-message"))));
+                player.sendMessage(Objects.requireNonNull(HexColor.color(Objects.requireNonNull(Config.getConfig().getString("shulker-open.shulker-combat-message")))));
                 return;
             }
             if (Config.getShulkerOpen().contains(item.getType())) {
@@ -75,7 +75,15 @@ public class ShulkerOpenEvent implements Listener {
                 if (state instanceof ShulkerBox) {
                     ShulkerBox shulkerBox = (ShulkerBox) state;
                     Inventory shulkerInventory = shulkerBox.getInventory();
-                    shulkerInventory.setContents(event.getInventory().getContents());
+
+                    ItemStack[] newContents = new ItemStack[shulkerInventory.getSize()];
+                    ItemStack[] eventContents = event.getInventory().getContents();
+                    for (int i = 0; i < eventContents.length; i++) {
+                        if (eventContents[i] != null) {
+                            newContents[i] = eventContents[i];
+                        }
+                    }
+                    shulkerInventory.setContents(newContents);
                     meta.setBlockState(shulkerBox);
                     item.setItemMeta(meta);
                     player.getInventory().setItemInMainHand(item);
