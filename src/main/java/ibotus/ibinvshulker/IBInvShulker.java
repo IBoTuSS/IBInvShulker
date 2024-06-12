@@ -5,10 +5,9 @@ import ibotus.ibinvshulker.event.ShulkerInventoryEvent;
 import ibotus.ibinvshulker.event.ShulkerOpenEvent;
 import ibotus.ibinvshulker.utils.HexColor;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class IBInvShulker extends JavaPlugin implements Listener {
+public class IBInvShulker extends JavaPlugin {
 
     private void msg(String msg) {
         String prefix = HexColor.color("&aIBInvShulker &7| ");
