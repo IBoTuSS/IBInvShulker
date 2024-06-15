@@ -32,7 +32,11 @@ public class ShulkerInventoryEvent implements Listener {
         if (blockedItems.contains(pickupItem.getType())) {
             return;
         }
-        
+
+        if (playerInventory.firstEmpty() != -1) {
+            return;
+        }
+
         for (ItemStack item : playerInventory.getContents()) {
             if (item != null && Config.getWhitelistedShulkers().contains(item.getType())) {
                 BlockStateMeta meta = (BlockStateMeta) item.getItemMeta();
@@ -69,6 +73,7 @@ public class ShulkerInventoryEvent implements Listener {
             }
         }
     }
+
 
     private int calculateSpaceLeftInShulker(Inventory shulkerInventory, ItemStack item) {
         int spaceLeft = 0;

@@ -22,7 +22,7 @@ public class IBInvShulker extends JavaPlugin {
         msg("&fVersion: &dv" + this.getDescription().getVersion());
         Bukkit.getConsoleSender().sendMessage("");
         getServer().getPluginManager().registerEvents(new ShulkerInventoryEvent(), this);
-        getServer().getPluginManager().registerEvents(new ShulkerOpenEvent(this), this);
+        getServer().getPluginManager().registerEvents(new ShulkerOpenEvent(), this);
     }
 
     @Override
