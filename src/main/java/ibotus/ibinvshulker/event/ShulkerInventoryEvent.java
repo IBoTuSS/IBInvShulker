@@ -1,6 +1,5 @@
 package ibotus.ibinvshulker.event;
 
-
 import ibotus.ibinvshulker.configurations.Config;
 
 import org.bukkit.Material;

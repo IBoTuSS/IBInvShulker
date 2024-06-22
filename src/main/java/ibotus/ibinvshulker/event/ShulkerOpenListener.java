@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ShulkerOpenEvent implements Listener {
+public class ShulkerOpenListener implements Listener {
 
     private final Map<Player, ItemStack> openedShulkers = new HashMap<>();
 
@@ -70,7 +70,9 @@ public class ShulkerOpenEvent implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        saveShulkerContents(player, event.getInventory());
+        if (openedShulkers.containsKey(player)) {
+            saveShulkerContents(player, event.getInventory());
+        }
     }
 
     @EventHandler
@@ -89,9 +91,12 @@ public class ShulkerOpenEvent implements Listener {
                 }
 
                 if (event.getClick().isKeyboardClick()) {
-                    ItemStack hotbarItem = player.getInventory().getItem(event.getHotbarButton());
-                    if (hotbarItem != null && hotbarItem.equals(openedShulkers.get(player))) {
-                        event.setCancelled(true);
+                    int hotbarButton = event.getHotbarButton();
+                    if (hotbarButton >= 0 && hotbarButton < player.getInventory().getSize()) {
+                        ItemStack hotbarItem = player.getInventory().getItem(hotbarButton);
+                        if (hotbarItem != null && hotbarItem.equals(openedShulkers.get(player))) {
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }
@@ -131,7 +136,8 @@ public class ShulkerOpenEvent implements Listener {
 
                     ItemStack[] newContents = new ItemStack[shulkerInventory.getSize()];
                     ItemStack[] eventContents = inventory.getContents();
-                    for (int i = 0; i < eventContents.length; i++) {
+                    int minSize = Math.min(eventContents.length, newContents.length);
+                    for (int i = 0; i < minSize; i++) {
                         if (eventContents[i] != null) {
                             newContents[i] = eventContents[i];
                         }
@@ -139,7 +145,23 @@ public class ShulkerOpenEvent implements Listener {
                     shulkerInventory.setContents(newContents);
                     meta.setBlockState(shulkerBox);
                     item.setItemMeta(meta);
-                    player.getInventory().setItemInMainHand(item);
+
+                    // Searching and updating the sheller box in the player's inventory
+                    boolean updated = false;
+                    for (int i = 0; i < player.getInventory().getSize(); i++) {
+                        ItemStack invItem = player.getInventory().getItem(i);
+                        if (invItem != null && invItem.isSimilar(openedShulkers.get(player))) { // Use isSimilar instead of equals
+                            player.getInventory().setItem(i, item);
+                            updated = true;
+                            break;
+                        }
+                    }
+
+                    // If not found, update the current item in the main hand
+                    if (!updated) {
+                        player.getInventory().setItemInMainHand(item);
+                    }
+
                     openedShulkers.remove(player);
                 }
             }
