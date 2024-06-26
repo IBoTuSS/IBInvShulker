@@ -4,6 +4,7 @@ import ibotus.ibinvshulker.configurations.Config;
 import ibotus.ibinvshulker.utils.HexColor;
 import ibotus.ibinvshulker.utils.Utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
@@ -19,6 +20,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +30,16 @@ import java.util.Objects;
 public class ShulkerOpenListener implements Listener {
 
     private final Map<Player, ItemStack> openedShulkers = new HashMap<>();
+    private final JavaPlugin plugin;
+
+    public ShulkerOpenListener(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-
-        if (event.getHand() == null || !event.getHand().equals(org.bukkit.inventory.EquipmentSlot.HAND)) {
-            return;
-        }
 
         if (!Config.getConfig().getBoolean("shulker-open.enabled")) {
             return;
@@ -43,12 +47,7 @@ public class ShulkerOpenListener implements Listener {
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR) {
             if (!Config.getConfig().getBoolean("shulker-open.enable-in-combat") && Utils.isInCombat(player)) {
-                String soundKey = "sound-combat";
-                Sound sound = Sound.valueOf(Config.getConfig().getString(soundKey + ".sound"));
-                float volume = (float) Config.getConfig().getDouble(soundKey + ".volume");
-                float pitch = (float) Config.getConfig().getDouble(soundKey + ".pitch");
-                player.playSound(player.getLocation(), sound, volume, pitch);
-                player.sendMessage(Objects.requireNonNull(HexColor.color(Objects.requireNonNull(Config.getConfig().getString("shulker-open.shulker-combat-message")))));
+                playCombatSound(player);
                 return;
             }
             if (Config.getShulkerOpen().contains(item.getType())) {
@@ -61,6 +60,17 @@ public class ShulkerOpenListener implements Listener {
                         player.openInventory(shulkerInventory);
                         openedShulkers.put(player, item);
                         event.setCancelled(true);
+
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (!isShulkerInInventory(player, item)) {
+                                    player.closeInventory();
+                                    openedShulkers.remove(player);
+                                    cancel();
+                                }
+                            }
+                        }.runTaskTimer(plugin, 0L, 1L);
                     }
                 }
             }
@@ -72,6 +82,7 @@ public class ShulkerOpenListener implements Listener {
         Player player = (Player) event.getPlayer();
         if (openedShulkers.containsKey(player)) {
             saveShulkerContents(player, event.getInventory());
+            openedShulkers.remove(player);
         }
     }
 
@@ -146,24 +157,39 @@ public class ShulkerOpenListener implements Listener {
                     meta.setBlockState(shulkerBox);
                     item.setItemMeta(meta);
 
-                    // Searching and updating the sheller box in the player's inventory
-                    boolean updated = false;
-                    for (int i = 0; i < player.getInventory().getSize(); i++) {
-                        ItemStack invItem = player.getInventory().getItem(i);
-                        if (invItem != null && invItem.isSimilar(openedShulkers.get(player))) { // Use isSimilar instead of equals
-                            player.getInventory().setItem(i, item);
-                            updated = true;
-                            break;
-                        }
-                    }
-
-                    // If not found, update the current item in the main hand
-                    if (!updated) {
-                        player.getInventory().setItemInMainHand(item);
-                    }
-
+                    openedShulkers.put(player, item);
                     openedShulkers.remove(player);
                 }
+            }
+        }
+    }
+
+    private boolean isShulkerInInventory(Player player, ItemStack shulker) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item != null && item.equals(shulker)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void playCombatSound(Player player) {
+        String soundKey = "sound.sound-combat";
+        String soundConfig = Config.getConfig().getString(soundKey);
+        if (soundConfig != null) {
+            String[] soundParts = soundConfig.split(":");
+            if (soundParts.length == 3) {
+                try {
+                    Sound sound = Sound.valueOf(soundParts[0]);
+                    float volume = Float.parseFloat(soundParts[1]);
+                    float pitch = Float.parseFloat(soundParts[2]);
+                    player.playSound(player.getLocation(), sound, volume, pitch);
+                    player.sendMessage(Objects.requireNonNull(HexColor.color(Objects.requireNonNull(Config.getConfig().getString("shulker-open.shulker-combat-message")))));
+                } catch (IllegalArgumentException e) {
+                    Bukkit.getLogger().warning("Неверное название звука для " + soundKey + ": " + soundParts[0]);
+                }
+            } else {
+                Bukkit.getLogger().warning("Неверный формат конфигурации звука для " + soundKey + ". Ожидаемый формат: sound:volume:pitch");
             }
         }
     }

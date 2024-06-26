@@ -9,8 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class IBInvShulker extends JavaPlugin {
 
-    private static IBInvShulker instance;
-
     private void msg(String msg) {
         String prefix = HexColor.color("&aIBInvShulker &7| ");
         Bukkit.getConsoleSender().sendMessage(HexColor.color(prefix + msg));
@@ -18,14 +16,13 @@ public class IBInvShulker extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
         Config.loadYaml(this);
         Bukkit.getConsoleSender().sendMessage("");
         msg("&fDeveloper: &aIBoTuS");
         msg("&fVersion: &dv" + this.getDescription().getVersion());
         Bukkit.getConsoleSender().sendMessage("");
         getServer().getPluginManager().registerEvents(new ShulkerInventoryEvent(), this);
-        getServer().getPluginManager().registerEvents(new ShulkerOpenListener(), this);
+        getServer().getPluginManager().registerEvents(new ShulkerOpenListener(this), this);
     }
 
     @Override
@@ -33,10 +30,6 @@ public class IBInvShulker extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage("");
         msg("&fDisable plugin.");
         Bukkit.getConsoleSender().sendMessage("");
-    }
-
-    public static IBInvShulker getInstance() {
-        return instance;
     }
 
 }

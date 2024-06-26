@@ -2,6 +2,8 @@ package ibotus.ibinvshulker.event;
 
 import ibotus.ibinvshulker.configurations.Config;
 
+import ibotus.ibinvshulker.utils.HexColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.ShulkerBox;
@@ -14,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ShulkerInventoryEvent implements Listener {
 
@@ -61,11 +64,24 @@ public class ShulkerInventoryEvent implements Listener {
                             event.setCancelled(true);
                         }
 
-                        String soundKey = "sound-pickup";
-                        Sound sound = Sound.valueOf(Config.getConfig().getString(soundKey + ".sound"));
-                        float volume = (float) Config.getConfig().getDouble(soundKey + ".volume");
-                        float pitch = (float) Config.getConfig().getDouble(soundKey + ".pitch");
-                        player.playSound(player.getLocation(), sound, volume, pitch);
+                        String soundKey = "sound.sound-pickup";
+                        String soundConfig = Config.getConfig().getString(soundKey);
+                        if (soundConfig != null) {
+                            String[] soundParts = soundConfig.split(":");
+                            if (soundParts.length == 3) {
+                                try {
+                                    Sound sound = Sound.valueOf(soundParts[0]);
+                                    float volume = Float.parseFloat(soundParts[1]);
+                                    float pitch = Float.parseFloat(soundParts[2]);
+                                    player.playSound(player.getLocation(), sound, volume, pitch);
+                                    player.sendMessage(Objects.requireNonNull(HexColor.color(Objects.requireNonNull(Config.getConfig().getString("shulker-open.shulker-combat-message")))));
+                                } catch (IllegalArgumentException e) {
+                                    Bukkit.getLogger().warning("Неверное название звука для " + soundKey + ": " + soundParts[0]);
+                                }
+                            } else {
+                                Bukkit.getLogger().warning("Неверный формат конфигурации звука для " + soundKey + ". Ожидаемый формат: sound:volume:pitch");
+                            }
+                        }
                         return;
                     }
                 }

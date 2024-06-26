@@ -1,13 +1,10 @@
 # Developer https://t.me/IBoTuS
 
-sound-pickup: #Звук при подборе предметов в шалкер
-  sound: ENTITY_ITEM_PICKUP #Название звука
-  volume: 0.3 #Громкость
-  pitch: 1.0 #Темп
-sound-combat: #Звук если игрок в бою пытается открыть шалкер
-  sound: BLOCK_NOTE_BLOCK_BASS #Название звука
-  volume: 1.0 #Громкость
-  pitch: 1.0 #Темп
+sound:
+  #Звук при подборе предметов в шалкер
+  sound-pickup: ENTITY_ITEM_PICKUP:0.3:1.0 #Название звука/Громкость/Темп
+  #Звук если игрок в бою пытается открыть шалкер
+  sound-combat: BLOCK_NOTE_BLOCK_BASS:1.0:1.0 #Название звука/Громкость/Темп
 
 shulker-inventory:
   #Включить/Выключить всасывания ресурсов в пустой шалкер игрока
